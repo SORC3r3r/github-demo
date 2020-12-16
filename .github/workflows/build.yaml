@@ -25,4 +25,6 @@ jobs:
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
       - name: Publish to Docker Registry
         if: github.ref == 'refs/heads/master'
-        run: docker push docker.pkg.github.com/${{ github.repository }}/hello-world:${{ github.sha }}
+        run: |
+          export lowercase_docker_image_name=$(echo "docker.pkg.github.com/${{ github.repository }}/hello-world" | sed -e 's/\(.*\)/\L\1/')
+          docker push $lowercase_docker_image_name:${{ github.sha }}
