@@ -1,0 +1,26 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+jobs:
+  build:
+
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: docker build -t docker.pkg.github.com/{{ github.repository }}/hello-world:${{ github.sha }} .
+
+      - name: Login to Docker Registry
+        if: github.ref == 'refs/heads/master'
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+      - name: Publish to Docker Registry
+        if: github.ref == 'refs/heads/master'
+        run: docker push docker.pkg.github.com/{{ github.repository }}/hello-world:${{ github.sha }}
