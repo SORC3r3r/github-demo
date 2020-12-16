@@ -15,7 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build
-        run: docker build -t docker.pkg.github.com/${{ github.repository }}/hello-world:${{ github.sha }} .
+        run: |
+          export lowercase_docker_image_name=$(echo "docker.pkg.github.com/${{ github.repository }}/hello-world" | sed -e 's/\(.*\)/\L\1/')
+          docker build -t $lowercase_docker_image_name:${{ github.sha }} .
 
       - name: Login to Docker Registry
         if: github.ref == 'refs/heads/master'
